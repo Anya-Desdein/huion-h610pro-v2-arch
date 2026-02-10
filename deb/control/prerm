@@ -1,0 +1,24 @@
+#!/bin/bash
+rm -rf /home/mydeb.log
+
+echo "Close huion dirver"
+
+CoreName=huionCore
+CorePid=`ps -e|grep $CoreName`
+if [ -n "$CorePid" ]; then
+	echo $CorePid
+	echo "found $CorePid"
+	sudo killall huiontablet
+fi
+
+echo "stop huiontablet success"
+
+AppName=huiontablet
+pid=`ps -e|grep $AppName`
+if [ -n "$pid" ]; then
+	echo $pid
+	echo "found $pid"
+	sudo killall huionCore
+fi
+
+echo "stop huionCore success"

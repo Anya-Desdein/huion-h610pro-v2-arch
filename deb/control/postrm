@@ -1,0 +1,33 @@
+#!/bin/bash
+
+rm -rf /usr/lib/huiontablet/
+
+if [ -f /home/*/.HuionCore.pid ]; then
+	str=`rm -f /home/*/.HuionCore.pid`
+	if [ "$str" !=  "" ]; then 
+		echo "$str";
+	fi
+fi
+
+if [ -f /home/*/.DriverUI.pid ]; then
+	str=`rm -f /home/*/.DriverUI.pid`
+	if [ "$str" !=  "" ]; then 
+		echo "$str";
+	fi
+fi
+
+if [ -f /home/*/.huion.log ]; then
+	str=`rm -f /home/*/.huion.log`
+	if [ "$str" !=  "" ]; then 
+		echo "$str";
+	fi
+fi
+
+if [ -f /usr/lib/udev/rules.d/20-huion.rules ]; then
+	str=`rm -f /usr/lib/udev/rules.d/20-huion.rules`
+	if [ "$str" !=  "" ]; then 
+		echo "$str";
+	fi
+fi
+
+echo "Uninstall succeeded."

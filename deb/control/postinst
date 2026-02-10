@@ -1,0 +1,140 @@
+#!/bin/bash
+
+echo "start install" 
+
+CUSTOM_CONF_RES_PATH="/usr/lib/huiontablet/custom.conf"
+MINT_STR="Mint" #""  Type=x11
+DEEPIN_STR="Deepin" #""  Type=x11
+MANJARO_STR="Manjaro" #"/etc/gdm/custom.conf"
+CENTOS_STR="CentOS" #"/etc/gdm/custom.conf"
+UBUNTU_STR="Ubuntu" #"/etc/gdm3/custom.conf"
+FEDORA_STR="Fedora" #"/etc/gdm/custom.conf"
+CUSTOM_CONF_FILE="/etc/gdm/custom.conf"
+check_os_release_result=`ls -li /etc/os-release | grep '^NAME' /etc/os-release`
+
+if [[ $check_os_release_result =~ $UBUNTU_STR ]]
+then
+    CUSTOM_CONF_FILE="/etc/gdm3/custom.conf"
+	if [ ! -d "/etc/gdm3/" ];then
+		mkdir /etc/gdm3
+	fi
+else
+	CUSTOM_CONF_FILE="/etc/gdm/custom.conf"
+	if [ ! -d "/etc/gdm/" ];then
+		mkdir /etc/gdm
+	fi
+fi
+
+# changeWaylandToX11
+if [ ! -f "$CUSTOM_CONF_FILE" ];then
+    # custom.conf文件不存在，复制一个到系统目录下
+	cp -a $CUSTOM_CONF_RES_PATH $CUSTOM_CONF_FILE
+else
+    WAYLAND_DISABLE_STR="#WaylandEnable=false"
+	WAYLAND_ENABLE_STR="WaylandEnable=false"
+    DEFAULTSESSION_IS_X11="DefaultSession=x11"
+	DISABLE_DEFAULTSESSION_IS_X11="#DefaultSession=x11"
+	SHARP_DAEMON_STR="#\\[daemon\\]"
+	DAEMON_STR="\\[daemon\\]"
+	if [[ `grep -c "$SHARP_DAEMON_STR" "$CUSTOM_CONF_FILE"` -ne '0' ]];then
+        sharp_daemon_line_num=`cat -n $CUSTOM_CONF_FILE |grep $SHARP_DAEMON_STR| awk '{print $1}'`
+        sed -i "${sharp_daemon_line_num}d" $CUSTOM_CONF_FILE
+        sed -i "${sharp_daemon_line_num}i ${DAEMON_STR}" $CUSTOM_CONF_FILE
+	fi
+
+    if [[ `grep -c "$WAYLAND_DISABLE_STR" "$CUSTOM_CONF_FILE"` -ne '0' ]];then
+        if [[ `grep -c "$DEFAULTSESSION_IS_X11" "$CUSTOM_CONF_FILE"` -ne '0' ]];then
+			insert_wayland_enable_str="WaylandEnable=false"
+			line_wayland_enable_num=`cat -n $CUSTOM_CONF_FILE |grep WaylandEnable| awk '{print $1}'`
+            sed -i "${line_wayland_enable_num}d" $CUSTOM_CONF_FILE
+            sed -i "${line_wayland_enable_num}i ${insert_wayland_enable_str}" $CUSTOM_CONF_FILE
+        else
+            insert_str="WaylandEnable=false\nDefaultSession=x11"
+			if [[ `grep -c "$DAEMON_STR" "$CUSTOM_CONF_FILE"` -ne '0' ]];then
+				insert_str="WaylandEnable=false\nDefaultSession=x11"
+			else
+				insert_str="$DAEMON_STR\nWaylandEnable=false\nDefaultSession=x11"
+			fi
+			line_num=`cat -n $CUSTOM_CONF_FILE |grep WaylandEnable| awk '{print $1}'`
+            sed -i "${line_num}d" $CUSTOM_CONF_FILE
+            sed -i "${line_num}i ${insert_str}" $CUSTOM_CONF_FILE
+        fi
+    else
+		if [[ `grep -c "$WAYLAND_ENABLE_STR" "$CUSTOM_CONF_FILE"` -ne '0' ]];then
+			if [[ `grep -c "$DEFAULTSESSION_IS_X11" "$CUSTOM_CONF_FILE"` -ne '0' ]];then
+				line_wayland_enable_default_session_num=`cat -n $CUSTOM_CONF_FILE |grep $DEFAULTSESSION_IS_X11| awk '{print $1}'`
+            	sed -i "${line_wayland_enable_default_session_num}d" $CUSTOM_CONF_FILE
+           		sed -i "${line_wayland_enable_default_session_num}i ${DEFAULTSESSION_IS_X11}" $CUSTOM_CONF_FILE
+			else
+				line_wayland_enable_default_session_num=`cat -n $CUSTOM_CONF_FILE |grep WaylandEnable| awk '{print $1}'`
+				line_wayland_enable_default_session_num=`expr $line_wayland_enable_default_session_num + 1`
+            	sed -i "${line_wayland_enable_default_session_num}i ${DEFAULTSESSION_IS_X11}" $CUSTOM_CONF_FILE
+			fi
+		else
+			if [[ `grep -c "$DEFAULTSESSION_IS_X11" "$CUSTOM_CONF_FILE"` -ne '0' ]];then
+				line_wayland_enable_default_session_num=`cat -n $CUSTOM_CONF_FILE |grep $DEFAULTSESSION_IS_X11| awk '{print $1}'`
+            	sed -i "${line_wayland_enable_default_session_num}d" $CUSTOM_CONF_FILE
+           		sed -i "${line_wayland_enable_default_session_num}i ${DEFAULTSESSION_IS_X11}" $CUSTOM_CONF_FILE
+				#line_wayland_enable_default_session_num=`expr $line_wayland_enable_default_session_num - 1`
+            	sed -i "${line_wayland_enable_default_session_num}i ${WAYLAND_ENABLE_STR}" $CUSTOM_CONF_FILE
+			else
+				if [[ `grep -c "$DAEMON_STR" "$CUSTOM_CONF_FILE"` -ne '0' ]];then
+					insert_str="WaylandEnable=false\nDefaultSession=x11"
+					line_num=`cat -n $CUSTOM_CONF_FILE |grep $DAEMON_STR| awk '{print $1}'`
+					line_num=`expr $line_num + 1`
+            		sed -i "${line_num}i ${insert_str}" $CUSTOM_CONF_FILE
+				else
+					insert_str="$DAEMON_STR\nWaylandEnable=false\nDefaultSession=x11"
+					sed -i "2i ${insert_str}" $CUSTOM_CONF_FILE
+				fi
+			fi
+		fi
+    fi
+fi
+
+if [[ `grep -c "$DAEMON_STR" "$CUSTOM_CONF_FILE"` -ne '0' ]];then
+	echo " "
+else
+	if [[ `grep -c "$WAYLAND_ENABLE_STR" "$CUSTOM_CONF_FILE"` -ne '0' ]];then
+		line_num=`cat -n $CUSTOM_CONF_FILE |grep $WAYLAND_ENABLE_STR| awk '{print $1}'`
+		#line_num=`expr $line_num - 1`
+        sed -i "${line_num}i ${DAEMON_STR}" $CUSTOM_CONF_FILE
+	fi
+fi
+
+XDOTOOL_SYS_BIN_FILE_PATH="/bin/xdotool"
+XDOTOOL_RES_BIN_FILE_PATH="/usr/lib/huiontablet/xdotool/xdotool"
+
+if [ ! -f "$XDOTOOL_SYS_BIN_FILE_PATH" ];then
+	cp -a $XDOTOOL_RES_BIN_FILE_PATH $XDOTOOL_SYS_BIN_FILE_PATH
+fi
+
+LIBXDO_SYS_LIB_FILE_PATH_UBUNTU="/lib/x86_64-linux-gnu/libxdo.so.3"
+LIBXDO_SYS_LIB_FILE_PATH_CENTOS="/usr/lib64/libxdo.so.3"
+LIBXDO_SYS_LIB_FILE_PATH_COMMON="/usr/lib/libxdo.so.3"
+LIBXDO_RES_LIB_FILE_PATH="/usr/lib/huiontablet/xdotool/libxdo.so.3"
+
+if [ ! -f "$LIBXDO_SYS_LIB_FILE_PATH_COMMON" ];then
+	cp -a $LIBXDO_RES_LIB_FILE_PATH $LIBXDO_SYS_LIB_FILE_PATH_COMMON
+fi
+
+if [[ $check_os_release_result =~ $UBUNTU_STR ]]
+then
+	if [ ! -f "$LIBXDO_SYS_LIB_FILE_PATH_UBUNTU" ];then
+		cp -a $LIBXDO_RES_LIB_FILE_PATH $LIBXDO_SYS_LIB_FILE_PATH_UBUNTU
+	fi
+fi
+
+if [ -f "/etc/bluetooth/input.conf" ]; then
+    sed -i 's/#UserspaceHID=true/UserspaceHID=true/' /etc/bluetooth/input.conf
+fi
+
+if [[ $check_os_release_result =~ $CENTOS_STR ]]
+then
+	if [ ! -f "$LIBXDO_SYS_LIB_FILE_PATH_CENTOS" ];then
+		cp -a $LIBXDO_RES_LIB_FILE_PATH $LIBXDO_SYS_LIB_FILE_PATH_CENTOS
+	fi
+fi
+echo "Please reboot your Linux device to run the driver, or the driver will not be useful." 
+
+

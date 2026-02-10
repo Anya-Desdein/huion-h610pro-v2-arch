@@ -1,0 +1,10 @@
+Package: HuionTablet
+Version: 15.0.0.175
+Section: utils
+Priority: extra
+Architecture: amd64
+Installed-Size: 31864k 
+Maintainer: chenbiao@huion.com
+Provides: Huion
+Description: Huion Tablet Driver Setting Software 
+
