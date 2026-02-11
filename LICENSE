@@ -1,0 +1,36 @@
+LICENSING INFORMATION
+=====================
+
+This repository contains packaging scripts created by the community maintainer.
+The packaging files themselves (PKGBUILD, huion-tablet.install, and related 
+scripts) are released under the WTFPL:
+
+            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+                    Version 2, December 2004
+
+ Copyright (C) 2004 Sam Hocevar <sam@hocevar.net>
+
+ Everyone is permitted to copy and distribute verbatim or modified
+ copies of this license document, and changing it is allowed as long
+ as the name is changed.
+
+            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+
+  0. You just DO WHAT THE FUCK YOU WANT TO.
+
+===============================================================================
+
+IMPORTANT: The above license ONLY applies to the packaging files created by
+the community maintainer (PKGBUILD, .install scripts, documentation, etc.).
+
+The Huion Tablet Driver software itself is proprietary and remains the 
+intellectual property of Huion Animation Technology Co., Ltd. The driver
+binary and associated files are subject to Huion's own license terms.
+
+By using this packaging script, you agree to:
+1. Download the driver from Huion's official sources
+2. Comply with Huion's license terms for the driver software
+3. Understand this is an UNOFFICIAL community repackaging
+
+No warranty is provided. Use at your own risk.
