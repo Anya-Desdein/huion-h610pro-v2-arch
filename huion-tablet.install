@@ -8,31 +8,6 @@ post_install() {
     echo "=========================================="
     echo ""
     
-    # Install xdotool to system locations if not present
-    # The driver bundles its own xdotool, but we check for system version first
-    if ! command -v xdotool >/dev/null 2>&1; then
-        echo "Installing bundled xdotool..."
-        if [ -f "/usr/lib/huiontablet/xdotool/xdotool" ]; then
-            cp -f /usr/lib/huiontablet/xdotool/xdotool /usr/local/bin/xdotool 2>/dev/null || \
-            cp -f /usr/lib/huiontablet/xdotool/xdotool /bin/xdotool 2>/dev/null || true
-            chmod +x /usr/local/bin/xdotool 2>/dev/null || chmod +x /bin/xdotool 2>/dev/null || true
-        fi
-        
-        # Install libxdo.so.3 library
-        if [ -f "/usr/lib/huiontablet/xdotool/libxdo.so.3" ]; then
-            # Try common library locations
-            if [ -d "/usr/lib" ]; then
-                cp -f /usr/lib/huiontablet/xdotool/libxdo.so.3 /usr/lib/libxdo.so.3 2>/dev/null || true
-            fi
-            if [ -d "/lib/x86_64-linux-gnu" ]; then
-                mkdir -p /lib/x86_64-linux-gnu 2>/dev/null || true
-                cp -f /usr/lib/huiontablet/xdotool/libxdo.so.3 /lib/x86_64-linux-gnu/libxdo.so.3 2>/dev/null || true
-            fi
-        fi
-    else
-        echo "System xdotool found, using that instead."
-    fi
-    
     # Configure Bluetooth input (if bluetooth is installed)
     if [ -f "/etc/bluetooth/input.conf" ]; then
         # Enable UserspaceHID for better tablet support
@@ -136,24 +111,6 @@ post_remove() {
     # Reload udev after removing rules
     udevadm control --reload-rules 2>/dev/null || true
     udevadm trigger 2>/dev/null || true
-    
-    # Remove bundled xdotool from system locations (if we installed it)
-    # Only remove if it's the same as what we installed
-    if [ -f "/bin/xdotool" ] && [ -f "/usr/lib/huiontablet/xdotool/xdotool" ]; then
-        # Check if it's the same file (simple check)
-        if cmp -s /bin/xdotool /usr/lib/huiontablet/xdotool/xdotool 2>/dev/null; then
-            rm -f /bin/xdotool 2>/dev/null || true
-        fi
-    fi
-    if [ -f "/usr/local/bin/xdotool" ] && [ -f "/usr/lib/huiontablet/xdotool/xdotool" ]; then
-        if cmp -s /usr/local/bin/xdotool /usr/lib/huiontablet/xdotool/xdotool 2>/dev/null; then
-            rm -f /usr/local/bin/xdotool 2>/dev/null || true
-        fi
-    fi
-    
-    # Remove bundled libxdo.so.3 (be careful - only if it's ours)
-    # We'll be conservative and not remove it automatically
-    # User can remove manually if needed
     
     echo "Uninstall cleanup completed."
 }

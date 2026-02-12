@@ -18,14 +18,13 @@ sha256sums=('bcf4d9263f2a82e942c79929a89d9841adef527febf91c43027ab3311f2c3ede') 
 prepare() {
     cd "$srcdir"
     
-    # Extract the .deb file
-    # .deb files are ar archives containing:
+    # Extract the .deb file that contains:
     # - debian-binary (version info)
     # - control.tar.xz (metadata and scripts)
     # - data.tar.xz (actual files)
     ar x "HuionTablet_LinuxDriver_v${pkgver}.x86_64.deb"
     
-    # Extract data archive (contains the actual files to install)
+    # Extract data archive
     tar -xf data.tar.*
 }
 
@@ -59,8 +58,4 @@ package() {
     echo "Removing incompatible bundled libraries..."
     rm -f "$pkgdir/usr/lib/huiontablet/libs/libdbus-1.so.3"
     rm -f "$pkgdir/usr/lib/huiontablet/libs/libsystemd.so.0"
-    
-    # Note: xdotool and libxdo.so.3 are bundled in the package
-    # They will be installed to /usr/lib/huiontablet/xdotool/
-    # The .install script handles copying them to system locations if needed
 }
