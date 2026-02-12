@@ -8,6 +8,7 @@ pkgdesc="Huion Tablet Driver Setting Software (requires X11)"
 arch=('x86_64')
 url="https://www.huion.com"
 license=('WTFPL' 'custom:Huion')
+options=('!debug') #comment that if you need debug symbols
 provides=('huion')
 conflicts=('huiontablet')
 depends=('qt5-base' 'qt5-declarative' 'qt5-quickcontrols' 'libx11' 'libxext' 'libxrender' 'libxrandr' 'dbus' 'systemd-libs')
