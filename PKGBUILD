@@ -12,7 +12,7 @@ provides=('huion')
 conflicts=('huiontablet')
 depends=('qt5-base' 'qt5-declarative' 'qt5-quickcontrols' 'libx11' 'libxext' 'libxrender' 'libxrandr' 'dbus' 'systemd-libs')
 install=huion-tablet.install
-source=("HuionTablet_LinuxDriver_v${pkgver}.x86_64.deb")
+source=("https://driverdl.huion.com/driver/Linux/HuionTablet_LinuxDriver_v${pkgver}.x86_64.deb")
 sha256sums=('bcf4d9263f2a82e942c79929a89d9841adef527febf91c43027ab3311f2c3ede')  # Replace with: sha256sum HuionTablet_LinuxDriver_v15.0.0.175.x86_64.deb
 
 prepare() {
