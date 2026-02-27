@@ -1,6 +1,10 @@
 # Maintainer: BABEL (Anya Desdein)
 # Contributor: Ported from Debian package v15.0.0.175
 
+# Ensure UTF-8 so bsdtar can handle pathnames with non-ASCII characters (e.g. Chinese in res/DevImg)
+export LC_ALL=C.UTF-8
+export LANG=C.UTF-8
+
 pkgname=huion-tablet
 pkgver=15.0.0.175
 pkgrel=1
