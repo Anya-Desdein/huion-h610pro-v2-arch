@@ -35,32 +35,47 @@ prepare() {
 
 package() {
     cd "$srcdir"
-    
-    # Copy all files from deb/data to package directory
-    # This preserves the directory structure
-    cp -r usr "$pkgdir/"
-    cp -r etc "$pkgdir/"
-    
+
+    install -dm755 "$pkgdir/opt/huiontablet"
+    cp -r usr/lib/huiontablet/* "$pkgdir/opt/huiontablet/"
+
+    install -dm755 "$pkgdir/opt/huiontablet/share/icons"
+    install -m644 usr/share/icons/huiontablet.png "$pkgdir/opt/huiontablet/share/icons/"
+
+    install -dm755 "$pkgdir/usr/lib/udev/rules.d"
+    install -m644 usr/lib/udev/rules.d/20-huion.rules "$pkgdir/usr/lib/udev/rules.d/"
+
+    # PATH: run with 'huiontablet'
+    install -dm755 "$pkgdir/usr/bin"
+    ln -s /opt/huiontablet/huiontablet.sh "$pkgdir/usr/bin/huiontablet"
+
     # Fix permissions for executables
-    chmod +x "$pkgdir/usr/lib/huiontablet/huiontablet"
-    chmod +x "$pkgdir/usr/lib/huiontablet/huionCore"
-    chmod +x "$pkgdir/usr/lib/huiontablet/huiontablet.sh"
-    chmod +x "$pkgdir/usr/lib/huiontablet/huionCore.sh"
-    
+    chmod +x "$pkgdir/opt/huiontablet/huiontablet"
+    chmod +x "$pkgdir/opt/huiontablet/huionCore"
+    chmod +x "$pkgdir/opt/huiontablet/huiontablet.sh"
+    chmod +x "$pkgdir/opt/huiontablet/huionCore.sh"
+
     # Fix permissions for bundled xdotool
-    if [ -f "$pkgdir/usr/lib/huiontablet/xdotool/xdotool" ]; then
-        chmod +x "$pkgdir/usr/lib/huiontablet/xdotool/xdotool"
+    if [ -f "$pkgdir/opt/huiontablet/xdotool/xdotool" ]; then
+        chmod +x "$pkgdir/opt/huiontablet/xdotool/xdotool"
     fi
-    
+
     # Remove temporary files that shouldn't be in the package
-    # (These are created at runtime)
-    rm -f "$pkgdir/usr/lib/huiontablet/.DriverUI.pid"
-    rm -f "$pkgdir/usr/lib/huiontablet/.huion.log"
-    rm -f "$pkgdir/usr/lib/huiontablet/.HuionCore.pid"
-    
+    rm -f "$pkgdir/opt/huiontablet/.DriverUI.pid"
+    rm -f "$pkgdir/opt/huiontablet/.huion.log"
+    rm -f "$pkgdir/opt/huiontablet/.HuionCore.pid"
+
     # Remove incompatible bundled libraries - use system libraries instead
-    # These bundled versions are incompatible with Arch's current libraries
     echo "Removing incompatible bundled libraries..."
-    rm -f "$pkgdir/usr/lib/huiontablet/libs/libdbus-1.so.3"
-    rm -f "$pkgdir/usr/lib/huiontablet/libs/libsystemd.so.0"
+    rm -f "$pkgdir/opt/huiontablet/libs/libdbus-1.so.3"
+    rm -f "$pkgdir/opt/huiontablet/libs/libsystemd.so.0"
+
+    # Desktop entries: patch paths for /opt and install
+    install -dm755 "$pkgdir/usr/share/applications" "$pkgdir/etc/xdg/autostart"
+    sed -e 's|/usr/lib/huiontablet/|/opt/huiontablet/|g' \
+        -e 's|/usr/share/icons/huiontablet.png|/opt/huiontablet/share/icons/huiontablet.png|g' \
+        usr/share/applications/huiontablet.desktop > "$pkgdir/usr/share/applications/huiontablet.desktop"
+    sed -e 's|/usr/lib/huiontablet/|/opt/huiontablet/|g' \
+        -e 's|/usr/share/icons/huiontablet.png|/opt/huiontablet/share/icons/huiontablet.png|g' \
+        etc/xdg/autostart/huiontablet.desktop > "$pkgdir/etc/xdg/autostart/huiontablet.desktop"
 }
