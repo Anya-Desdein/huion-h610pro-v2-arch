@@ -45,7 +45,6 @@ package() {
     install -dm755 "$pkgdir/usr/lib/udev/rules.d"
     install -m644 usr/lib/udev/rules.d/20-huion.rules "$pkgdir/usr/lib/udev/rules.d/"
 
-    # PATH: run with 'huiontablet'
     install -dm755 "$pkgdir/usr/bin"
     ln -s /opt/huiontablet/huiontablet.sh "$pkgdir/usr/bin/huiontablet"
 
@@ -70,12 +69,8 @@ package() {
     rm -f "$pkgdir/opt/huiontablet/libs/libdbus-1.so.3"
     rm -f "$pkgdir/opt/huiontablet/libs/libsystemd.so.0"
 
-    # Desktop entries: patch paths for /opt and install
-    install -dm755 "$pkgdir/usr/share/applications" "$pkgdir/etc/xdg/autostart"
+    install -dm755 "$pkgdir/usr/share/applications"
     sed -e 's|/usr/lib/huiontablet/|/opt/huiontablet/|g' \
         -e 's|/usr/share/icons/huiontablet.png|/opt/huiontablet/share/icons/huiontablet.png|g' \
         usr/share/applications/huiontablet.desktop > "$pkgdir/usr/share/applications/huiontablet.desktop"
-    sed -e 's|/usr/lib/huiontablet/|/opt/huiontablet/|g' \
-        -e 's|/usr/share/icons/huiontablet.png|/opt/huiontablet/share/icons/huiontablet.png|g' \
-        etc/xdg/autostart/huiontablet.desktop > "$pkgdir/etc/xdg/autostart/huiontablet.desktop"
 }

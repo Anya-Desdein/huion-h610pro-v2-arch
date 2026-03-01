@@ -25,15 +25,16 @@ post_install() {
         udevadm trigger
         echo "Udev rules installed and reloaded"
     fi
-    
+
     echo ""
-    echo "NOTE: This driver requires X11 (not Wayland)"
-    echo "Since you're using i3, you're already on X11 - no configuration needed!"
+    echo "NOTE: This driver requires X11 (not Wayland)."
     echo ""
     echo "To start the driver, run:"
     echo "  /opt/huiontablet/huiontablet.sh"
     echo ""
-    echo "Or launch 'HuionTablet' from your application menu."
+    echo "To have the command on your PATH, add to ~/.bashrc (or your shell config):"
+    echo "  export PATH=\"/opt/huiontablet:\$PATH\""
+    echo "Then you can run huiontablet.sh from any terminal, or launch 'HuionTablet' from your application menu."
     echo ""
     echo "You may need to reboot for udev rules to take full effect."
     echo ""
