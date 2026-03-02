@@ -26,6 +26,9 @@ post_install() {
         echo "Udev rules installed and reloaded"
     fi
 
+    # Allow users to write HUION_*.cfg in /opt/huiontablet/res (fixes write_a_user_config errors)
+    [ -d /opt/huiontablet/res ] && chmod 777 /opt/huiontablet/res
+
     echo ""
     echo "NOTE: This driver requires X11 (not Wayland)."
     echo ""

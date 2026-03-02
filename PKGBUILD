@@ -17,8 +17,10 @@ provides=('huion')
 conflicts=('huiontablet')
 depends=('qt5-base' 'qt5-declarative' 'qt5-quickcontrols' 'libx11' 'libxext' 'libxrender' 'libxrandr' 'dbus' 'systemd-libs')
 install=huion-tablet.install
-source=("https://driverdl.huion.com/driver/Linux/HuionTablet_LinuxDriver_v${pkgver}.x86_64.deb")
-sha256sums=('bcf4d9263f2a82e942c79929a89d9841adef527febf91c43027ab3311f2c3ede')  # Replace with: sha256sum HuionTablet_LinuxDriver_v15.0.0.175.x86_64.deb
+source=("https://driverdl.huion.com/driver/Linux/HuionTablet_LinuxDriver_v${pkgver}.x86_64.deb"
+        "huiontablet-launch.sh")
+sha256sums=('bcf4d9263f2a82e942c79929a89d9841adef527febf91c43027ab3311f2c3ede'
+            'cbc4417b5ecd0e1473808bf43c5b4eef0689af21659d5b36398012bbba6c5c15')
 
 prepare() {
     cd "$srcdir"
@@ -31,6 +33,9 @@ prepare() {
     
     # Extract data archive
     tar -xf data.tar.*
+    
+    # Use our launch script (fixes false "already running", quieter, stderr -> log)
+    cp -f huiontablet-launch.sh usr/lib/huiontablet/huiontablet.sh
 }
 
 package() {
@@ -44,6 +49,11 @@ package() {
 
     install -dm755 "$pkgdir/usr/lib/udev/rules.d"
     install -m644 usr/lib/udev/rules.d/20-huion.rules "$pkgdir/usr/lib/udev/rules.d/"
+    # H610 Pro v2 and similar use different input device names; without these, EventGet=-1
+    echo '' >> "$pkgdir/usr/lib/udev/rules.d/20-huion.rules"
+    echo '# H610 Pro v2 and similar (Huion Huion Tablet Pen / Huion Tablet)' >> "$pkgdir/usr/lib/udev/rules.d/20-huion.rules"
+    echo 'SUBSYSTEM=="input", KERNEL=="event*", ATTRS{name}=="HUION Huion Tablet Pen", MODE:="0666"' >> "$pkgdir/usr/lib/udev/rules.d/20-huion.rules"
+    echo 'SUBSYSTEM=="input", KERNEL=="event*", ATTRS{name}=="HUION Huion Tablet", MODE:="0666"' >> "$pkgdir/usr/lib/udev/rules.d/20-huion.rules"
 
     install -dm755 "$pkgdir/usr/bin"
     ln -s /opt/huiontablet/huiontablet.sh "$pkgdir/usr/bin/huiontablet"
@@ -68,6 +78,9 @@ package() {
     echo "Removing incompatible bundled libraries..."
     rm -f "$pkgdir/opt/huiontablet/libs/libdbus-1.so.3"
     rm -f "$pkgdir/opt/huiontablet/libs/libsystemd.so.0"
+
+    # Allow users to write HUION_*.cfg (user config) in res/; binary has no XDG/config option
+    chmod 777 "$pkgdir/opt/huiontablet/res"
 
     install -dm755 "$pkgdir/usr/share/applications"
     sed -e 's|/usr/lib/huiontablet/|/opt/huiontablet/|g' \
