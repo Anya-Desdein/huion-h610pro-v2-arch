@@ -5,7 +5,7 @@
 export LC_ALL=C.UTF-8
 export LANG=C.UTF-8
 
-pkgname=huion-tablet
+pkgname=huion-tablet-h610prov2
 pkgver=15.0.0.175
 pkgrel=1
 pkgdesc="Huion Tablet Driver Setting Software (requires X11)"
@@ -16,11 +16,11 @@ options=('!debug') #comment that if you need debug symbols
 provides=('huion')
 conflicts=('huiontablet')
 depends=('qt5-base' 'qt5-declarative' 'qt5-quickcontrols' 'libx11' 'libxext' 'libxrender' 'libxrandr' 'dbus' 'systemd-libs')
-install=huion-tablet.install
+install=huion-tablet-h610prov2.install
 source=("https://driverdl.huion.com/driver/Linux/HuionTablet_LinuxDriver_v${pkgver}.x86_64.deb"
         "huiontablet-launch.sh")
 sha256sums=('bcf4d9263f2a82e942c79929a89d9841adef527febf91c43027ab3311f2c3ede'
-            'cbc4417b5ecd0e1473808bf43c5b4eef0689af21659d5b36398012bbba6c5c15')
+            'd4a7faa8a401382b7da065b2bb56877057eb882a5ea066e52db593ed52b1f27b')
 
 prepare() {
     cd "$srcdir"

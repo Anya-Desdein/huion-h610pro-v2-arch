@@ -14,18 +14,22 @@ export QT_QPA_PLATFORM_PLUGIN_PATH
 QML2_IMPORT_PATH=$dirname/qml
 export QML2_IMPORT_PATH
 
-# Only match the actual binaries by exact process name (avoid matching this script or grep)
-if pgrep -x huionCore >/dev/null; then
-	killall huionCore >/dev/null 2>&1
-	sleep 1
-fi
-
-if pgrep -x huiontablet >/dev/null; then
-	killall huiontablet >/dev/null 2>&1
-	sleep 1
-fi
-
-sleep 2
+# Kill existing huionCore (daemon) and huiontablet (GUI) so we can restart cleanly.
+# Do not kill ourselves: when run as `huiontablet`, our process name is "huiontablet" too.
+self=$$
+for pid in $(pgrep -x huionCore 2>/dev/null); do
+	kill "$pid" 2>/dev/null || true
+done
+sleep 1
+for pid in $(pgrep -x huiontablet 2>/dev/null); do
+	[ "$pid" != "$self" ] && kill "$pid" 2>/dev/null || true
+done
+sleep 1
+# Force kill any that are still running (still exclude self)
+for pid in $(pgrep -x huiontablet 2>/dev/null); do
+	[ "$pid" != "$self" ] && kill -9 "$pid" 2>/dev/null || true
+done
+sleep 1
 
 LOG_DIR="${HUION_LOG_DIR:-$HOME/.local/share/huiontablet}"
 mkdir -p "$LOG_DIR"
