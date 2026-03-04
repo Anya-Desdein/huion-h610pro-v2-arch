@@ -1,6 +1,18 @@
 # Arch Linux install script for Huion Tablet Driver
 # This replaces Debian's preinst, postinst, prerm, and postrm scripts
 
+pre_install() {
+    # This driver is X11-only; block installation under Wayland
+    if [ -n "$WAYLAND_DISPLAY" ] || [ "$XDG_SESSION_TYPE" = "wayland" ]; then
+        echo ""
+        echo "ERROR: This driver requires X11 and does not support Wayland."
+        echo "You appear to be in a Wayland session (WAYLAND_DISPLAY or XDG_SESSION_TYPE=wayland)."
+        echo "Installation aborted. Use an X11 session or XWayland is not sufficient for this driver."
+        echo ""
+        exit 1
+    fi
+}
+
 post_install() {
     echo ""
     echo "=========================================="
@@ -44,6 +56,15 @@ post_install() {
 }
 
 pre_upgrade() {
+    # Block upgrade on Wayland
+    if [ -n "$WAYLAND_DISPLAY" ] || [ "$XDG_SESSION_TYPE" = "wayland" ]; then
+        echo ""
+        echo "ERROR: This driver requires X11 and does not support Wayland."
+        echo "You appear to be in a Wayland session. Upgrade aborted."
+        echo ""
+        exit 1
+    fi
+
     echo "Stopping Huion driver processes before upgrade..."
     
     # Stop running processes gracefully
