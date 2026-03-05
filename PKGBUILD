@@ -7,7 +7,7 @@ export LANG=C.UTF-8
 
 pkgname=huion-tablet-h610prov2
 pkgver=15.0.0.175
-pkgrel=1
+pkgrel=2
 pkgdesc="Huion Tablet Driver Setting Software (requires X11)"
 arch=('x86_64')
 url="https://www.huion.com"
